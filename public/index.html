@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARGA - Система Генерации Тестов</title>
+    <link rel="stylesheet" href="/public/styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 MARGA</h1>
+        <p>Math Assessment Recognition & Grading Automation</p>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('students')">👥 Студенты</button>
+            <button class="nav-tab" onclick="switchTab('trash')">🗑️ Корзина</button>
+            <button class="nav-tab" onclick="switchTab('problems')">📝 Задачи</button>
+            <button class="nav-tab" onclick="switchTab('tests')">📋 Тесты</button>
+            <button class="nav-tab" onclick="switchTab('scan')">📷 Сканирование</button>
+            <button class="nav-tab" onclick="switchTab('results')">📊 Результаты</button>
+        </div>
+
+        <!-- Students Tab -->
+        <div id="students-tab" class="tab-content active">
+            <div class="card">
+                <h2>Регистрация Студента</h2>
+                <form id="student-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Имя *</label>
+                            <input type="text" id="student-firstname" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Фамилия *</label>
+                            <input type="text" id="student-lastname" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Класс *</label>
+                            <select id="student-class" required>
+                                <option value="">Выберите класс</option>
+                                <option value="5">5 класс</option>
+                                <option value="6">6 класс</option>
+                                <option value="7">7 класс</option>
+                                <option value="8">8 класс</option>
+                                <option value="9">9 класс</option>
+                                <option value="10">10 класс</option>
+                                <option value="11">11 класс</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="student-email">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зарегистрировать Студента</button>
+                </form>
+                <div id="student-result"></div>
+            </div>
+
+            <div class="card">
+                <h2>Список Студентов</h2>
+                <div class="form-group">
+                    <input type="text" id="student-search" placeholder="Поиск..." oninput="searchStudents()">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Номер</th>
+                                <th>Имя</th>
+                                <th>Фамилия</th>
+                                <th>Класс</th>
+                                <th>Email</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-list">
+                            <tr><td colspan="6" class="empty-state">Загрузка...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trash Tab -->
+        <div id="trash-tab" class="tab-content">
+            <div class="card">
+                <h2>Корзина</h2>
+                <p style="color: #666; margin-bottom: 20px;">Удаленные студенты. Вы можете восстановить их или удалить навсегда.</p>
+
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-danger" onclick="cleanAllTrash()" id="clean-all-btn">
+                        🗑️ Очистить всю корзину
+                    </button>
+                    <span id="trash-stats" style="margin-left: 20px; color: #666;"></span>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Номер</th>
+                                <th>Имя</th>
+                                <th>Фамилия</th>
+                                <th>Класс</th>
+                                <th>Email</th>
+                                <th>Удалено</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trash-list">
+                            <tr><td colspan="7" class="empty-state">Загрузка...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problems Tab -->
+        <div id="problems-tab" class="tab-content">
+            <div class="card">
+                <h2>Создать Задачу</h2>
+                <form id="problem-form">
+                    <div class="form-group">
+                        <label>Текст задачи (Русский) *</label>
+                        <textarea id="problem-text-ru" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Текст задачи (Казахский)</label>
+                            <textarea id="problem-text-kz"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Текст задачи (Английский)</label>
+                            <textarea id="problem-text-en"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Правильный ответ *</label>
+                        <input type="text" id="problem-correct" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Неправильный ответ 1 *</label>
+                            <input type="text" id="problem-wrong-1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Неправильный ответ 2 *</label>
+                            <input type="text" id="problem-wrong-2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Неправильный ответ 3 *</label>
+                            <input type="text" id="problem-wrong-3" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Класс *</label>
+                            <select id="problem-class" required>
+                                <option value="">Выберите</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Сложность *</label>
+                            <select id="problem-difficulty" required>
+                                <option value="">Выберите</option>
+                                <option value="easy">Легкая</option>
+                                <option value="medium">Средняя</option>
+                                <option value="hard">Сложная</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Четверть</label>
+                            <select id="problem-quarter">
+                                <option value="">Не указано</option>
+                                <option value="1">1 четверть</option>
+                                <option value="2">2 четверть</option>
+                                <option value="3">3 четверть</option>
+                                <option value="4">4 четверть</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Тэги (через запятую, макс 5)</label>
+                        <input type="text" id="problem-tags" placeholder="например: algebra, equations, linear">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Формула (опционально)</label>
+                        <input type="text" id="problem-formula" placeholder="например: 2x + 5 = 13">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Создать Задачу</button>
+                </form>
+                <div id="problem-result"></div>
+            </div>
+
+            <div class="card">
+                <h2>Список Задач</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <select id="filter-class" onchange="filterProblems()">
+                            <option value="">Все классы</option>
+                            <option value="5">5 класс</option>
+                            <option value="6">6 класс</option>
+                            <option value="7">7 класс</option>
+                            <option value="8">8 класс</option>
+                            <option value="9">9 класс</option>
+                            <option value="10">10 класс</option>
+                            <option value="11">11 класс</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="filter-difficulty" onchange="filterProblems()">
+                            <option value="">Все сложности</option>
+                            <option value="easy">Легкая</option>
+                            <option value="medium">Средняя</option>
+                            <option value="hard">Сложная</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="problems-list">
+                    <p class="empty-state">Загрузка задач...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tests Tab -->
+        <div id="tests-tab" class="tab-content">
+            <div class="card">
+                <h2>Генерировать Тест</h2>
+                <form id="test-form">
+                    <div class="form-group">
+                        <label>Название теста *</label>
+                        <input type="text" id="test-name" required placeholder="например: Алгебра - Контрольная №1">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Класс *</label>
+                            <select id="test-class" required>
+                                <option value="">Выберите</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Количество вопросов *</label>
+                            <select id="test-questions" required>
+                                <option value="">Выберите</option>
+                                <option value="25">25 вопросов</option>
+                                <option value="40">40 вопросов</option>
+                                <option value="100">100 вопросов</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Язык *</label>
+                            <select id="test-language" required>
+                                <option value="ru">Русский</option>
+                                <option value="kz">Казахский</option>
+                                <option value="en">Английский</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Сложность (можно несколько)</label>
+                        <div style="display: flex; gap: 1rem;">
+                            <label><input type="checkbox" value="easy" class="test-difficulty"> Легкая</label>
+                            <label><input type="checkbox" value="medium" class="test-difficulty"> Средняя</label>
+                            <label><input type="checkbox" value="hard" class="test-difficulty"> Сложная</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Тэги (опционально, через запятую)</label>
+                        <input type="text" id="test-tags" placeholder="например: algebra, geometry">
+                    </div>
+
+                    <button type="submit" class="btn btn-success">🎯 Сгенерировать Тест</button>
+                </form>
+                <div id="test-result"></div>
+            </div>
+
+            <div class="card">
+                <h2>Созданные Тесты</h2>
+                <div id="tests-list">
+                    <p class="empty-state">Загрузка тестов...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scan Tab -->
+        <div id="scan-tab" class="tab-content">
+            <div class="card">
+                <h2>Загрузить Бланк Ответов</h2>
+                <form id="scan-form">
+                    <div class="form-group">
+                        <label>Выберите тест *</label>
+                        <select id="scan-test" required>
+                            <option value="">Загрузка...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Отсканированный бланк *</label>
+                        <input type="file" id="scan-file" accept="image/*" required>
+                        <small>Формат: JPG, PNG. Минимум 1200px ширина. Хорошее освещение.</small>
+                    </div>
+
+                    <div id="scan-preview" style="margin-top: 1rem;"></div>
+
+                    <button type="submit" class="btn btn-primary">📷 Обработать Бланк</button>
+                </form>
+                <div id="scan-result"></div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+        <div id="results-tab" class="tab-content">
+            <div class="card">
+                <h2>Результаты Тестов</h2>
+                <div class="form-group">
+                    <label>Выберите тест</label>
+                    <select id="results-test" onchange="loadResults()">
+                        <option value="">Загрузка...</option>
+                    </select>
+                </div>
+                <div id="results-display">
+                    <p class="empty-state">Выберите тест для просмотра результатов</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Редактировать Студента</h2>
+            <form id="edit-student-form">
+                <input type="hidden" id="edit-student-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Имя *</label>
+                        <input type="text" id="edit-student-firstname" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Фамилия *</label>
+                        <input type="text" id="edit-student-lastname" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Класс *</label>
+                        <select id="edit-student-class" required>
+                            <option value="">Выберите класс</option>
+                            <option value="5">5 класс</option>
+                            <option value="6">6 класс</option>
+                            <option value="7">7 класс</option>
+                            <option value="8">8 класс</option>
+                            <option value="9">9 класс</option>
+                            <option value="10">10 класс</option>
+                            <option value="11">11 класс</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="edit-student-email">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <button type="button" class="btn" onclick="closeEditModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/app.js"></script>
+</body>
+</html>

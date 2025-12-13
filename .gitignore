@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Storage (generated files)
+storage/images/*
+storage/pdfs/*
+storage/scans/*
+
+# Keep directory structure but ignore contents
+!storage/images/.gitkeep
+!storage/pdfs/.gitkeep
+!storage/scans/.gitkeep
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pm2.log
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*_processed.jpg
+
+# Test files
+test/
+coverage/
+
+# Production
+dist/
+build/
